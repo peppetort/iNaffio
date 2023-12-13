@@ -1,0 +1,5 @@
+{
+    "sensor_task":{
+        "sampling_rate_seconds": 10
+    }
+}
