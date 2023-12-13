@@ -1,0 +1,15 @@
+[project]
+version="0.1.0"
+name = "inaffio_utils"
+authors = [
+  { name="Giuseppe Tortorelli", email="peppetort@gmail.com" },
+]
+description = "Set of class that implements some useful functions for task communication and data manipulation"
+readme = "README.md"
+dependencies = [
+
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
