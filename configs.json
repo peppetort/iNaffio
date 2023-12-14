@@ -1,5 +1,12 @@
 {
     "sensor_task":{
-        "sampling_rate_seconds": 10
+        "sampling_rate_seconds": 600,
+        "humidity_alarm_threshold": 0.5
+    },
+    "bot_task":{
+        "alarm_notification_period": 3600,
+        "allowed_users": [
+            "peppetort"
+        ]
     }
 }
