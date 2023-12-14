@@ -90,6 +90,9 @@ class BotTask:
         # set scale
         ax2.set_ylim([0, 100])
 
+        # set plot title
+        plt.suptitle("Last 24 hours telemetry")
+
         plt.savefig(bio, format="png")
         bio.seek(0)
         plt.close()

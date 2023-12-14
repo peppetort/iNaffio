@@ -102,5 +102,5 @@ class SensorTask:
         self._load_configs()
 
         self.scheduler = sched.scheduler(time.time, time.sleep)
-        self.scheduler.enter(self.sample_rate_seconds, 1, self._scheduler_task)
+        self.scheduler.enter(0, 1, self._scheduler_task)
         self.scheduler.run()
