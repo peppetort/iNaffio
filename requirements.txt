@@ -1,2 +1,5 @@
 smbus-cffi
 tinydb
+pyTelegramBotAPI
+python-dotenv
+matplotlib
