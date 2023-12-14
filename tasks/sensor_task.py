@@ -1,6 +1,5 @@
 import datetime
 import json
-import queue
 import sched
 import smbus
 import time
@@ -10,10 +9,10 @@ from db_utils.db_message import DBMessage, DBAction
 
 logging.basicConfig(level=logging.INFO)
 
-CONFIG_FILE = "../configs.json"
+CONFIG_FILE = "configs.json"
+
 
 class SensorTask:
-
     def __init__(self, alarm_queue, db_queue):
         self._tag = "SENSOR_TASK"
         self.alarm_queue = alarm_queue
@@ -23,6 +22,7 @@ class SensorTask:
         # default configs
         # will be overwritten by configs.json if exists
         self.sample_rate_seconds = 60
+        self.humidity_alarm_threshold = 5
 
     def _read_measurement(self) -> (float, float):
         # import random
@@ -34,10 +34,20 @@ class SensorTask:
             time.sleep(0.5)
 
             # Read data from sensor
-            data = self.bus.read_i2c_block_data(0x44, 0x00, 6)   
+            data = self.bus.read_i2c_block_data(0x44, 0x00, 6)
 
             c_temp = ((((data[0] * 256.0) + data[1]) * 175) / 65535.0) - 45
             humidity = 100 * (data[3] * 256 + data[4]) / 65535.0
+
+            if humidity <= self.humidity_alarm_threshold:
+                logging.info(f"[{self._tag}]: humidity alarm triggered")
+                if self.alarm_queue.empty():
+                    self.alarm_queue.put(
+                        {
+                            "time": datetime.datetime.now().timestamp(),
+                            "measures": {"temperature": c_temp, "humidity": humidity},
+                        }
+                    )
 
             return c_temp, humidity
         except Exception as e:
@@ -56,11 +66,18 @@ class SensorTask:
             if "sampling_rate_seconds" not in configs[section]:
                 logging.warning(f"[{self._tag}]: no configs found, using defaults")
                 return
-            
-            self.sample_rate_seconds = configs[section]["sampling_rate_seconds"]
 
-            logging.info(f"[{self._tag}]: config loaded\n\tsample_rate_seconds: {self.sample_rate_seconds}")
-            
+            if "humidity_alarm_threshold" not in configs[section]:
+                logging.warning(f"[{self._tag}]: no configs found, using defaults")
+                return
+
+            self.sample_rate_seconds = configs[section]["sampling_rate_seconds"]
+            self.humidity_alarm_threshold = configs[section]["humidity_alarm_threshold"]
+
+            logging.info(
+                f"[{self._tag}]: config loaded\n\tsample_rate_seconds: {self.sample_rate_seconds}"
+            )
+
     def _scheduler_task(self):
         c_temp, humidity = self._read_measurement()
 
@@ -71,19 +88,14 @@ class SensorTask:
 
         payload = {
             "time": datetime.datetime.now().timestamp(),
-            "measures": {
-                "temperature": c_temp,
-                "humidity": humidity
-            }
+            "measures": {"temperature": c_temp, "humidity": humidity},
         }
 
-        message = DBMessage( DBAction.ADD, payload=payload)
+        message = DBMessage(DBAction.ADD, payload=payload)
         self.db_queue.put(message)
 
         # reschedule
         self.scheduler.enter(self.sample_rate_seconds, 1, self._scheduler_task)
-
-
 
     def run(self):
         logging.info(f"[{self._tag}]: started")
@@ -92,12 +104,3 @@ class SensorTask:
         self.scheduler = sched.scheduler(time.time, time.sleep)
         self.scheduler.enter(self.sample_rate_seconds, 1, self._scheduler_task)
         self.scheduler.run()
-
-
-
-if __name__ == "__main__":
-    alarm_queue = queue.Queue()
-    db_queue = queue.Queue()
-    sensor_task = SensorTask(alarm_queue, db_queue)
-    sensor_task.run()
-
