@@ -1,12 +1,16 @@
 {
     "sensor_task":{
         "sampling_rate_seconds": 600,
-        "humidity_alarm_threshold": 0.5
+        "humidity_alarm_threshold": 50
     },
     "bot_task":{
         "alarm_notification_period": 3600,
         "allowed_users": [
             "peppetort"
         ]
+    },
+    "pump_task":{
+        "activity_seconds": 2,
+        "gpio_pin": 11
     }
 }
