@@ -72,10 +72,10 @@ class BotTask:
         y1 = [r["measures"]["temperature"] for r in res]
         y2 = [r["measures"]["humidity"] for r in res]
 
-        ax1.plot(x, y1, "-o", color="orange")
+        ax1.plot(x, y1, "-", color="orange")
         ax1.set_ylabel("Temperature [°C]")
 
-        ax2.plot(x, y2, "-o", color="blue")
+        ax2.plot(x, y2, "-", color="blue")
         ax2.set_ylabel("Humidity [%]")
         ax2.set_xlabel("Time")
 
@@ -175,8 +175,13 @@ class BotTask:
 
     def _handle_callback_query(self, call):
         if call.data == "water_yes":
-            self.bot.send_message(call.message.chat.id, "I will water the Bonsai")
-            self.pump_queue.put(True)
+            if self.pump_queue.empty():
+                self.bot.send_message(call.message.chat.id, "I will water the Bonsai")
+                self.pump_queue.put(True)
+            else:
+                self.bot.send_message(
+                    call.message.chat.id, "I am already watering the Bonsai"
+                )
         elif call.data == "water_no":
             self.bot.send_message(
                 call.message.chat.id, "Ok, I will not water the Bonsai"
@@ -253,10 +258,14 @@ class BotTask:
             logging.info(f"[{self._tag}]: sending alarm message")
 
             ts = alarm["time"]
-            date = datetime.datetime.fromtimestamp(ts).strftime("%d/%m/%Y")
-            time = datetime.datetime.fromtimestamp(ts).strftime("%H:%M:%S")
+            dt = datetime.datetime.fromtimestamp(ts) + datetime.timedelta(hours=1)
+            date = dt.strftime("%d/%m/%Y")
+            time = dt.strftime("%H:%M:%S")
             temperature = alarm["measures"]["temperature"]
             humidity = alarm["measures"]["humidity"]
+
+            temperature = round(temperature, 2)
+            humidity = round(humidity, 2)
 
             for chat_id in self.allowed_users.values():
                 if chat_id is None:
