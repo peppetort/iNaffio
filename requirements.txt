@@ -3,3 +3,4 @@ tinydb
 pyTelegramBotAPI
 python-dotenv
 matplotlib
+RPi.GPIO
