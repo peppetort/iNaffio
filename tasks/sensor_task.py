@@ -75,7 +75,7 @@ class SensorTask:
             self.humidity_alarm_threshold = configs[section]["humidity_alarm_threshold"]
 
             logging.info(
-                f"[{self._tag}]: config loaded\n\tsample_rate_seconds: {self.sample_rate_seconds}"
+                f"[{self._tag}]: config loaded\n\tsample_rate_seconds: {self.sample_rate_seconds}\n\thumidity_alarm_threshold: {self.humidity_alarm_threshold}"
             )
 
     def _scheduler_task(self):
