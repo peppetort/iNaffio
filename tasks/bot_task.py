@@ -198,6 +198,9 @@ class BotTask:
         else:
             self.bot.send_message(call.message.chat.id, "Unknown command")
 
+        # remove message with buttons
+        self.bot.delete_message(call.message.chat.id, call.message.message_id)
+
     def _check_user(self, message):
         user = message.from_user.username
 
