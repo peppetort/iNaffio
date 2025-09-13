@@ -17,9 +17,11 @@ The images below show the complete **Inaffio hardware setup**:
 - The **soil moisture sensor** is inserted **obliquely into the soil**: this placement provides an average reading across different depths, ensuring that the measured humidity better reflects the real conditions of the soil (not just the surface).  
 
 
-![Telegram Bot](images/telegram.jpeg)
-![Telegram Bot](images/hw.jpeg)
-![Telegram Bot](images/plant.PNG)
+<p align="center">
+  <img src="images/telegram.jpeg" alt="System overview" width="30%"/>
+  <img src="images/hw.jpeg" alt="3D-printed case and diffusers" width="30%"/>
+  <img src="images/plant.PNG" alt="Soil sensor placement" width="30%"/>
+</p>
 
 ---
 
