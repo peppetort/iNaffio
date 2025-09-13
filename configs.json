@@ -6,7 +6,7 @@
     "bot_task":{
         "alarm_notification_period": 3600,
         "allowed_users": [
-            "peppetort"
+            "YOUR_TELEGRAM_USERNAME"
         ]
     },
     "pump_task":{
